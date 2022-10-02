@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useSelector } from 'react-redux';
 import styled from "styled-components"
 import Comment from './Comment';
 
@@ -25,17 +27,38 @@ const Input = styled.input`
   padding: 5px;
   width: 100%;
 `;
-const Comments = () => {
+const Comments = ({ videoId }) => {// Comentario para el video que se esta visionando
+  console.log({videoId})
+  const { currentUser } = useSelector((state) => state.user);  // Usuario logueado
+
+  const [comments, setComments] = useState([]);                // State para los comments 
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get(`/comments/${videoId}`);   // Petición para obtener los comentarios de un video
+        console.log(res.data);
+        setComments(res.data);                                 // Estado para los comments []
+      } catch (err) {}
+    };
+    fetchComments();
+  }, [videoId]);
+  
+  
+
+
   return (
     <Container>
+
       <NewComment>
-        <Avatar src="https://images.pexels.com/photos/1162361/pexels-photo-1162361.jpeg?auto=compress&cs=tinysrgb&w=1600"/>
-        <Input placeholder="Add a comment"/>
+        <Avatar src={ currentUser.img } />
+        <Input placeholder="Add a comment..." />
       </NewComment>
-      <Comment />
-      <Comment />
-      <Comment />
-      <Comment />
+
+      { comments.map(comment => (                             // mapeamos los comentarios
+        <Comment key={ comment._id } comment={ comment }/>    // y los mostramos. ( Enviamos el id del comentario y el { comment })
+      ))}
+
     </Container>
   )
 }

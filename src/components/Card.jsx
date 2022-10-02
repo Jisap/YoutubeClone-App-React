@@ -1,6 +1,8 @@
-import React from 'react'
+import axios from "axios";
+import React, { useEffect, useState } from 'react'
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { format } from "timeago.js";
 
 const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "360px"};
@@ -45,19 +47,41 @@ const Info = styled.div`
 `;
 
 
-export const Card = ({ type }) => {
+export const Card = ({ type, video }) => { // type viene de la page video.jsx como una prop, video viene de home
+  
+  const [channel, setChannel] = useState({})
+
+  useEffect(() => {
+   const fetchChannel = async () => {
+    const resp = await axios.get(`/users/find/${video.userId}`) // Apuntamos al usuario como canal de video
+    setChannel( resp.data )                                     // y establecemos el canal en base a ese usuario
+  }
+  fetchChannel()
+}, [video.userId]);
+
+
   return (
-    <Link to="/video/test" style={{textDecoration: 'none'}}>
+    // El Link nos envia a la page /video con el param video._id
+    <Link to={`/video/${video._id}`} style={{textDecoration: 'none'}}> 
       <Container type={ type }>
-        <Image type={ type } src="https://images.pexels.com/photos/7302903/pexels-photo-7302903.jpeg?auto=compress&cs=tinysrgb&w=1600"/>
+
+        <Image 
+          type={ type } 
+          src={ video.imgUrl }
+        />
+
         <Details type={ type }>
-          <ChannelImage src="https://images.pexels.com/photos/1162361/pexels-photo-1162361.jpeg?auto=compress&cs=tinysrgb&w=1600"/>
+          <ChannelImage 
+            type={ type }  
+            src={ channel.img }
+          />
           <Texts>
-              <Title>Test Video</Title>
-              <ChannelName>Jisap Dev</ChannelName>
-              <Info>660,908 views • 1 day ago</Info>
+              <Title>{ video.title }</Title>
+              <ChannelName>{ channel.name }</ChannelName>
+              <Info>{ video.views } views • { format(video.createdAt) }</Info>
           </Texts>
         </Details>
+
       </Container>
     </Link>
   )

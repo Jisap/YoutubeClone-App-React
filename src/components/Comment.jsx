@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from "styled-components"
+import axios from "axios"
 
 const Container = styled.div`
   display: flex;
@@ -34,20 +35,28 @@ const Text = styled.span`
   font-size: 14px;
 `;
 
-const Comment = () => {
+const Comment = ({ comment }) => {                                  // Se recibe el comentario {}
+  
+  const [channel, setChannel] = useState({});       
+
+  useEffect(() => {
+    const fetchComment = async () => {
+      const res = await axios.get(`/users/find/${comment.userId}`); // Obtenemos el channel con el id del usuario contenido en el comment
+      setChannel(res.data)                                          // Establecemos el estado del channel ( información sobre el user que comento )
+    };
+    fetchComment();
+  }, [comment.userId]);
+
+
+  
   return (
     <Container>
-      <Avatar src="https://images.pexels.com/photos/1162361/pexels-photo-1162361.jpeg?auto=compress&cs=tinysrgb&w=1600" />
+      <Avatar src={ channel.img } />
       <Details>
         <Name>
-          John Doe <Date>1 day ago</Date>
+          { channel.name } <Date>1 day ago</Date>
         </Name>
-        <Text>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel, ex
-          laboriosam ipsam aliquam voluptatem perferendis provident modi, sequi
-          tempore reiciendis quod, optio ullam cumque? Quidem numquam sint
-          mollitia totam reiciendis?
-        </Text>
+        <Text>{ comment.desc }</Text>
       </Details>
     </Container>
   )

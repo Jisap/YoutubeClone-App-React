@@ -17,7 +17,9 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightnessOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/userSlice";
 
 
 const Container = styled.div`
@@ -79,28 +81,51 @@ const Title = styled.h2`
   margin-bottom: 20px;
 `;
 
+const Logout = styled.div`
+  margin-bottom: 10px;
+`
+
 const Menu = ({ darkMode, setDarkMode }) => {
+
+   const { currentUser } = useSelector( state => state.user )
+   const dispatch = useDispatch() 
+   const navigate = useNavigate()
+
+   const handleLogout = async() => {
+      dispatch( logout() )
+      navigate("/")
+   }
+
   return (
     <Container>
       <Wrapper>
+        
         <Link to="/" style={{textDecoration: 'none', color:"inherit"}}>
           <Logo>
             <Img src={ JisapTube } />
             Jisap Tube
           </Logo>
         </Link>
-        <Item>
-          <HomeIcon />
-          Home
-        </Item>
-        <Item>
-          <ExploreOutlinedIcon />
-          Explore
-        </Item>
-        <Item>
-          <SubscriptionsOutlinedIcon />
-          Subscriptions
-        </Item>
+
+        <Link to="/" style={{textDecoration: 'none', color:"inherit"}}>
+          <Item>
+            <HomeIcon />
+            Home
+          </Item>
+        </Link>
+
+        <Link to="trends" style={{textDecoration:"none", color:"inherit"}}>
+          <Item>
+            <ExploreOutlinedIcon />
+            Explore
+          </Item>
+        </Link>
+        <Link to="subscriptions" style={{textDecoration:"none", color:"inherit"}}>
+          <Item>
+            <SubscriptionsOutlinedIcon />
+            Subscriptions
+          </Item>
+        </Link>
         <Hr />
         <Item>
           <VideoLibraryOutlinedIcon />
@@ -111,18 +136,46 @@ const Menu = ({ darkMode, setDarkMode }) => {
           History
         </Item>
         <Hr />
-        <Login>
-          Sign in to like videos, comment, and subscribe.
+
+        {/* { !currentUser && 
+          <>
+          <Login>
+            Sign in to like videos, comment, and subscribe.
           
-          <Link to="signing" style={{textDecoration:"none"}}>
-            <Button>
-              <AccountCircleOutlinedIcon />
-              SIGN IN
-            </Button>
-          </Link>
+            <Link to="signing" style={{textDecoration:"none"}}>
+              <Button>
+                <AccountCircleOutlinedIcon />
+                SIGN IN
+              </Button>
+            </Link>   
+          </Login>
+          <Hr />
+          </>
+        } */}
+
+        { !currentUser ? (
+          <>
+          <Login>
+            Sign in to like videos, comment, and subscribe.
           
-        </Login>
-        <Hr />
+            <Link to="signing" style={{textDecoration:"none"}}>
+              <Button>
+                <AccountCircleOutlinedIcon />
+                SIGN IN
+              </Button>
+            </Link>   
+          </Login>
+          <Hr />
+          </> ) : (
+            <Logout >
+              <Button onClick={ handleLogout }>
+                Logout
+              </Button>
+            </Logout>
+          )
+        }        
+
+
         <Title>BEST OF JISAPTUBE</Title>
         <Item>
           <LibraryMusicOutlinedIcon />
